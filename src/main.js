@@ -20,15 +20,17 @@ Vue.mixin({
   beforeCreate () {
     if (_.isString(this.$options.store)) {
       this.$store = mainStore.lookup(this.$options.store)
-      this.$store.value$.subscribe(value => { this.state = value })
-      this.$store.config$.subscribe(value => { this.config = value })
+      this.$store.value$.subscribe(value => { this.model = value; this.m = value })
+      this.$store.config$.subscribe(value => { this.config = value; this.cfg = value })
     }
   },
   data () {
     if (_.isString(this.$options.store)) {
       return {
-        state: this.$store.getState(),
-        config: {}
+        model: this.$store.getState(),
+        m: this.$store.getState(),
+        config: {},
+        cfg: {}
       }
     }
     return {}

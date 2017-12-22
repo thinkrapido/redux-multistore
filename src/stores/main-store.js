@@ -275,8 +275,12 @@ export class AbstractViewStore extends AbstractStore {
   getState () {
     return super.getState().state
   }
-  getTemplateConfig () {
-    return super.getState().tplConfig
+  getTemplateConfig (path) {
+    let out = super.getState().tplConfig
+    if (!_.isUndefined(path)) {
+      out = _.get(out, path)
+    }
+    return out
   }
 
   assertAll () {

@@ -26,22 +26,22 @@ export class CounterStore extends AbstractViewStore {
   }
 
   tplReducers = {
-    'odd': (state, payload) => {
-      return payload % 2 === 1
+    'isOdd': (state, payload) => {
+      const out = payload % 2 === 1
+      return out
     }
   }
 
   epics = {
     'inc': (action$) => {
-      return action$.do(action => this.lookup('MessageStore').dispatch('set', `Value set: ${this.getState()}`)).mapTo(this.stop())
-    },
-    'inc2': (action$) => {
-      return action$.map(action => {
-        return this.tpl('odd', this.getState())
-      })
+      return action$
+        .do(action => this.lookup('MessageStore').dispatch('set', `Value set: ${this.getState()}`))
+        .map(action => { return this.tpl('isOdd', this.getState()) })
     },
     'dec': (action$) => {
-      return action$.do(action => this.lookup('MessageStore').dispatch('set', `Value set: ${this.getState()}`)).mapTo(this.stop())
+      return action$
+      .do(action => this.lookup('MessageStore').dispatch('set', `Value set: ${this.getState()}`))
+      .map(action => { return this.tpl('isOdd', this.getState()) })
     }
   }
 

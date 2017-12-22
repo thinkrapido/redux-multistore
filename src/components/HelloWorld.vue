@@ -1,9 +1,9 @@
 <template>
-  <div class="hello">
-    {{ state }}
+  <h2 class="hello">
+    {{ model }} is odd: {{ cfg.isOdd }}
     <button @click.stop.prevent="inc">Inc</button>
     <button @click.stop.prevent="dec">Dec</button>
-  </div>
+  </h2>
 </template>
 
 <script>
@@ -24,18 +24,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
+h2 {
   font-weight: normal;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
+button {
+  font-size: 1em;
 }
 </style>
