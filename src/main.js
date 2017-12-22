@@ -4,38 +4,36 @@ import 'rxjs'
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import MainStore from './stores/main-store'
+import { create, mainStore } from './stores/main-store'
 import { CounterStore } from './stores/counter-store'
 import { MessageStore } from './stores/message-store'
 import _ from 'lodash'
 
-Vue.config.productionTip = false
-
-MainStore.createStore(
+create(
   CounterStore,
   MessageStore
 )
 
-const store = MainStore.store
-const counterStore = MainStore.lookup('CounterStore')
+Vue.config.productionTip = false
 
-console.log(_.cloneDeep(store.getState()))
-
-counterStore.act('inc')
-
-console.log(_.cloneDeep(store.getState()))
-
-counterStore.act('inc')
-
-console.log(_.cloneDeep(store.getState()))
-
-counterStore.act('inc')
-
-console.log(_.cloneDeep(store.getState()))
-
-MainStore.lookup('MessageStore').reset()
-
-console.log(_.cloneDeep(store.getState()))
+Vue.mixin({
+  beforeCreate () {
+    if (_.isString(this.$options.store)) {
+      this.$store = mainStore.lookup(this.$options.store)
+      this.$store.value$.subscribe(value => { this.state = value })
+      this.$store.config$.subscribe(value => { this.config = value })
+    }
+  },
+  data () {
+    if (_.isString(this.$options.store)) {
+      return {
+        state: this.$store.getState(),
+        config: {}
+      }
+    }
+    return {}
+  }
+})
 
 /* eslint-disable no-new */
 new Vue({

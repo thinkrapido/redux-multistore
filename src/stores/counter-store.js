@@ -18,6 +18,9 @@ export class CounterStore extends AbstractViewStore {
       return state + 1
     },
     'dec': (state, payload) => {
+      if (state < 1) {
+        return state
+      }
       return state - 1
     }
   }
@@ -30,7 +33,7 @@ export class CounterStore extends AbstractViewStore {
 
   epics = {
     'inc': (action$) => {
-      return action$.do(action => this.lookup('MessageStore').act('set', `Value set: ${this.getState()}`)).mapTo(this.stop())
+      return action$.do(action => this.lookup('MessageStore').dispatch('set', `Value set: ${this.getState()}`)).mapTo(this.stop())
     },
     'inc2': (action$) => {
       return action$.map(action => {
@@ -38,7 +41,7 @@ export class CounterStore extends AbstractViewStore {
       })
     },
     'dec': (action$) => {
-      return action$.do(action => console.log(action, this.getState())).mapTo(this.stop())
+      return action$.do(action => this.lookup('MessageStore').dispatch('set', `Value set: ${this.getState()}`)).mapTo(this.stop())
     }
   }
 

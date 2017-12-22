@@ -16,7 +16,9 @@ export class MessageStore extends AbstractStore {
 
   epics = {
     'set': action$ => {
-      return action$.do(action => console.log(this.getState())).mapTo(this.stop())
+      return action$
+        .do(action => console.log(this.getState()))
+        .mapTo(this.stop())
     }
   }
 

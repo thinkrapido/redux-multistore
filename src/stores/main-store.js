@@ -1,13 +1,11 @@
 import _ from 'lodash'
+import Rx from 'rxjs'
 import { createStore, applyMiddleware } from 'redux'
 import { combineEpics, createEpicMiddleware } from 'redux-observable'
-import Rx from 'rxjs'
 
 export class MainStore {
   stores = {};
   store = null;
-
-  static mainStore = new MainStore();
 
   constructor () {
     this.stores = {}
@@ -20,7 +18,7 @@ export class MainStore {
     return this.store.getState()
   }
 
-  createStore (...storeClasses) {
+  create (...storeClasses) {
     if (_.size(storeClasses) === 0) {
       return
     }
@@ -107,14 +105,13 @@ export class AbstractStore {
     this._store$ = null
   }
 
-  subscribe$ (successFn, errorFn, completeFn) {
-    if (_.isNull(this._stream$)) {
-      this._store$ = Rx.Obserable.create((observer) => {
+  get value$ () {
+    if (_.isNull(this._store$)) {
+      this._store$ = Rx.Observable.create((observer) => {
         this.store.subscribe(() => {
           observer.next(_.get(this.store.getState(), this.id))
         })
       })
-      .subscribe(successFn, errorFn, completeFn)
       .distinctUntilChanged()
       .share()
     }
@@ -143,10 +140,10 @@ export class AbstractStore {
   }
 
   reset () {
-    this.act('$reset')
+    this.dispatch('$reset')
   }
 
-  act (action, payload) {
+  dispatch (action, payload) {
     this.store.dispatch({ type: `${this.id}.${action}`, payload })
   }
   stop () {
@@ -154,7 +151,7 @@ export class AbstractStore {
   }
 
   lookup (className) {
-    return MainStore.mainStore.lookup(className)
+    return mainStore.lookup(className)
   }
 
   assertAll () {
@@ -249,11 +246,24 @@ export class AbstractViewStore extends AbstractStore {
     }
   }
 
-  act (action, payload, isTplAction) {
+  get value$ () {
+    return super.value$
+      .map(value => { return value.state })
+      .distinctUntilChanged()
+      .share()
+  }
+  get config$ () {
+    return super.value$
+      .map(value => { return value.tplConfig })
+      .distinctUntilChanged()
+      .share()
+  }
+
+  dispatch (action, payload, isTplAction) {
     if (isTplAction === true) {
       action = `__TPL__.${action}`
     }
-    super.act(action, payload)
+    super.dispatch(action, payload)
   }
   tpl (path, payload) {
     return {
@@ -275,4 +285,6 @@ export class AbstractViewStore extends AbstractStore {
   }
 }
 
-export default MainStore.mainStore
+export let mainStore = new MainStore()
+
+export let create = (...classNames) => { mainStore.create(...classNames) }

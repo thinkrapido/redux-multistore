@@ -1,14 +1,22 @@
 <template>
   <div class="hello">
+    {{ state }}
+    <button @click.stop.prevent="inc">Inc</button>
+    <button @click.stop.prevent="dec">Dec</button>
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'HelloWorld',
-  data () {
-    return {
-      msg: 'Welcome to Your Vue.js App'
+  store: 'CounterStore',
+  methods: {
+    inc: function (event) {
+      this.$store.dispatch('inc')
+    },
+    dec: function (event) {
+      this.$store.dispatch('dec')
     }
   }
 }
